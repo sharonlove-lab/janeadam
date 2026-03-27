@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Web Forum</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "KaiTi", "楷体", "STKaiti", "cursive", serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 0;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .content-area {
+            font-family: "KaiTi", "楷体", "STKaiti", serif;
+            line-height: 1.8;
+            font-size: 1.4rem;
+        }
+
+        .container {
+            width: 100vw;
+            height: 100vh;
+            max-width: none;
+            background: #0a0a0a;
+            border-radius: 0;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.3s;
+        }
+.delete-btn {
+            float: right;
+            color: #880000;
+            cursor: pointer;
+            font-weight: bold;
+            border: 1px solid #444;
+            padding: 0 5px;
+            font-size: 0.8em;
+            transition: 0.3s;
+        }
+        .delete-btn:hover {
+            background: #880000;
+            color: #fff;
+        }
+
+        .cover-page {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 60%, rgba(139, 0, 0, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #0d0d0d 0%, #1a0505 100%);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .cover-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100"><rect fill="%23000" width="100" height="100"/><circle cx="50" cy="50" r="30" fill="none" stroke="%238b0000" stroke-width="1" opacity="0.1"/></svg>');
+            opacity: 0.3;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 0.4; }
+        }
+
+        .cover-page:hover {
+            box-shadow: 
+                inset 0 0 50px rgba(139, 0, 0, 0.2),
+                0 0 40px rgba(139, 0, 0, 0.4);
+        }
+
+        .logo {
+            font-size: 72px;
+            margin-bottom: 20px;
+            text-shadow: 
+                0 0 20px rgba(139, 0, 0, 0.8),
+                0 0 40px rgba(139, 0, 0, 0.4);
+            animation: glow 2s ease-in-out infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes glow {
+            from {
+                text-shadow: 
+                    0 0 20px rgba(139, 0, 0, 0.8),
+                    0 0 40px rgba(139, 0, 0, 0.4);
+            }
+            to {
+                text-shadow: 
+                    0 0 30px rgba(139, 0, 0, 1),
+                    0 0 60px rgba(139, 0, 0, 0.6);
+            }
+        }
+
+        .cover-title {
+            font-size: 32px;
+            font-weight: bold;
+            color: #8b0000;
+            text-shadow: 
+                2px 2px 4px rgba(0, 0, 0, 0.8),
+                0 0 10px rgba(139, 0, 0, 0.5);
+            letter-spacing: 4px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .cover-subtitle {
+            font-size: 14px;
+            color: #666;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+            z-index: 1;
+        }
+
+        .enter-hint {
+            position: absolute;
+            bottom: 40px;
+            font-size: 12px;
+            color: #555;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0.3; }
+        }
+
+        .main-page {
+            width: 100%;
+            height: 100%;
+            display: none;
+            position: relative;
+        }
+
+        .main-page.active {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+        .background-logo {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 200px;
+            color: rgba(139, 0, 0, 0.05);
+            filter: blur(3px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .search-container {
+    width: 50%;
+    max-width: 1000px;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 10;
+    margin: 0;
+}
+
+.search-container.top {
+            position: static;
+            transform: none;
+            margin: 30px auto 30px auto; 
+            padding: 0 20px;
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.5rem;
+            background: rgba(20, 20, 20, 0.8);
+            border: 3px solid #555; 
+            border-radius: 40px; 
+            font-family: "KaiTi", "楷体";
+            color: #ff3333;
+            outline: none;
+            text-align: center;
+            letter-spacing: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box:focus {
+            border-color: #8b0000;
+            box-shadow: 0 0 20px rgba(139, 0, 0, 0.4);
+        }
+
+        .search-box::placeholder {
+            color: #555;
+        }
+
+        .content-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: none;
+        }
+
+        .content-area.active {
+            display: block;
+        }
+
+        .content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content-area::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: rgba(139, 0, 0, 0.4);
+            border-radius: 4px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb:hover {
+            background: rgba(139, 0, 0, 0.6);
+        }
+
+        .article {
+            background: rgba(20, 20, 20, 0.6);
+            border: 1px solid rgba(139, 0, 0, 0.2);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 
+                0 4px 12px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(139, 0, 0, 0.1);
+        }
+
+        .article h2 {
+            color: #8b0000;
+            font-size: 20px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(139, 0, 0, 0.5);
+            border-bottom: 1px solid rgba(139, 0, 0, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .article h3 {
+            color: #a52a2a;
+            font-size: 16px;
+            margin: 15px 0 10px 0;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+        }
+
+        .article p {
+            line-height: 1.8;
+            margin-bottom: 12px;
+            color: #c0c0c0;
+        }
+
+        .article strong {
+            color: #8b0000;
+        }
+
+        .article ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .article li {
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 10px;
+            line-height: 1.8;
+        }
+
+        .article li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #8b0000;
+        }
+
+        .warning {
+            background: rgba(139, 0, 0, 0.1);
+            border: 1px solid rgba(139, 0, 0, 0.3);
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+            color: #ff6b6b;
+        }
+
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(139, 0, 0, 0.3), transparent);
+            margin: 20px 0;
+        }
+
+        .comments-section {
+            margin-top: 30px;
+            border-top: 2px solid rgba(139, 0, 0, 0.2);
+            padding-top: 20px;
+        }
+
+        .comments-title {
+            color: #8b0000;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 5px rgba(139, 0, 0, 0.3);
+        }
+
+        .comment {
+            background: rgba(15, 15, 15, 0.6);
+            border-left: 3px solid rgba(139, 0, 0, 0.4);
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+
+        .comment-header {
+            color: #a52a2a;
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .comment-content {
+            color: #b0b0b0;
+            line-height: 1.7;
+            font-size: 1.1rem;
+        }
+
+        .comment-content blockquote {
+            border-left: 2px solid rgba(139, 0, 0, 0.3);
+            padding-left: 15px;
+            margin: 10px 0;
+            color: #888;
+            font-style: italic;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .cursor {
+            display: inline-block;
+            width: 8px;
+            height: 1.2em;
+            background-color: #ff3333;
+            animation: blink 0.8s infinite;
+            vertical-align: middle;
+            margin-left: 5px;
+        }
+        @keyframes blink { 
+            0% { opacity: 1; } 
+            50% { opacity: 0; } 
+            100% { opacity: 1; } 
+        }
+        @keyframes alarm-blink {
+            0% { background-color: #0a0a0a; }
+            50% { background-color: #4a0000; }
+            100% { background-color: #0a0a0a; }
+        }
+        .alarm-active {
+            animation: alarm-blink 0.5s infinite;
+        }
+.comment-section {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px dashed #444;
+        }
+        .comment-input-area {
+            margin-bottom: 20px;
+        }
+        #commentInput {
+            width: 100%;
+            background: #111;
+            border: 1px solid #444;
+            color: #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            font-family: inherit;
+        }
+        .submit-btn {
+            background: #4a0000;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+        }
+.comment-item {
+    background: rgba(255,255,255,0.05);
+    padding: 15px;
+    margin-bottom: 15px;
+    font-size: 1.1rem;
+        }
+        .comment-meta { color: #880000; margin-bottom: 5px; font-weight: bold; }
+        .decrypt-container {
+            width: 100%;
+            height: 20px;
+            background: #1a0000;
+            border: 1px solid #444;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .decrypt-bar {
+            width: 0%;
+            height: 100%;
+            background: #ff3333;
+            box-shadow: 0 0 15px #ff3333;
+            transition: width 0.1s linear;
+        }
+
+        .decrypt-status {
+            position: absolute;
+            width: 100%;
+            text-align: center;
+            line-height: 20px;
+            font-size: 0.8rem;
+            color: #fff;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px #000;
+            mix-blend-mode: difference;
+        }
+    </style>
+</head>
+<body>
+    <audio id="bgMusic" loop preload="auto" style="display: none;">
+        <source src="bgm.mp3" type="audio/mpeg">
+    </audio>
+
+<audio id="alarmSound" loop preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/1001/1001-preview.mp3" type="audio/mpeg">
+</audio>
+
+<audio id="typeSound" preload="auto">
+    <source src="https://assets.mixkit.co/active_storage/sfx/1117/1117-preview.mp3" type="audio/mpeg">
+</audio>
+
+    <div class="container">
+        <!-- 封面页 -->
+        <div class="cover-page" id="coverPage">
+            <div class="logo">🕸️</div>
+            <div class="cover-title">暗网论坛</div>
+            <div class="cover-subtitle">Dark Web Forum</div>
+            <div class="enter-hint">点击进入 ▸</div>
+        </div>
+
+        <!-- 主界面 -->
+        <div class="main-page" id="mainPage">
+            <button id="playBtn" style="position: absolute; top: 15px; right: 20px; z-index: 10; background: rgba(0,0,0,0.6); border: 1px solid #8b0000; color: #8b0000; border-radius: 30px; padding: 6px 12px; font-family: monospace; cursor: pointer;">🎵</button>
+            <div class="background-logo">🕸️</div>
+            <div class="search-container" id="searchContainer">
+                <input type="text" class="search-box" id="searchBox" placeholder="搜索词条..." autocomplete="off">
+            </div>
+            <div class="content-area" id="contentArea">
+    <div id="searchResults"></div>
+    
+    <div id="global-comments" style="margin: 40px 0; padding: 20px; background: rgba(20,20,20,0.6); border-radius: 12px; border: 1px solid rgba(139,0,0,0.3); display: none;">
+        <script src="https://giscus.app/client.js"
+            data-repo="sharonlove-lab/janeadam"
+            data-repo-id="R_kgDORyBBQg"
+            data-category="Announcements"
+            data-category-id="DIC_kwDORyBBQs4C5YDA"
+            data-mapping="pathname"
+            data-strict="0"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="bottom"
+            data-theme="preferred_color_scheme"
+            data-lang="zh-CN"
+            crossorigin="anonymous"
+            async>
+        </script>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <div id="global-comments" style="margin: 40px 20px; padding: 20px; background: rgba(20,20,20,0.6); border-radius: 12px; border: 1px solid rgba(139,0,0,0.3);">
+        <script src="https://giscus.app/client.js"
+        data-repo="sharonlove-lab/janeadam"
+        data-repo-id="R_kgDORyBBQg"
+        data-category="Announcements"
+        data-category-id="DIC_kwDORyBBQs4C5YDA"
+        data-mapping="pathname"
+        data-strict="0"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN"
+        crossorigin="anonymous"
+        async>
+</script>
+    </div>
+
+
+    <script>
+        const articles = {
+            '李室长': {
+                title: '【"李室长"词条】',
+                content: `
+                    <div class="article fade-in">
+                        <h2>李简</h2>
+                        <p style="color: #888; font-size: 13px;">六欲集团战略企划室室长 | 海城商界最具争议的新锐人物</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎基本信息</h3>
+                        <p><strong>姓名：</strong> 李简</p>
+                        <p><strong>出生：</strong> 1999年（26岁）</p>
+                        <p><strong>国籍：</strong> 中华（海城）</p>
+                        <p><strong>职业：</strong> 企业高管</p>
+                        <p><strong>现任：</strong> 六欲集团战略企划室室长</p>
+                        <p><strong>知名于：</strong> 商业并购中的激进策略，六欲集团商业化转型的主要推手之一。</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <p>李简，六欲集团（Six Desires Group）现任战略企划室室长，是海城近年来商业界崛起速度最快、也最富神秘色彩的人物之一。他在2025年被任命为新成立的战略企划室负责人，直接向集团董事会汇报。李简以其极高的商业智慧、果决狠辣的行事风格以及与其年龄不符的深沉心机而闻名。他被普遍认为是协助六欲集团从早期"原始积累"阶段成功向现代化、集团化商业模式转型的关键人物。</p>
+                        
+                        <h3>▎早年经历</h3>
+                        <p>关于李简的早期背景，公开资料极少，六欲集团亦将其个人信息高度保密。</p>
+                        <p>据未经证实的消息源称，李简可能成长于海城北部的灰铁区，家庭背景普通，与其如今在嘉南区CBD的精英形象形成巨大反差。其教育背景成谜，在海城各大高校的公开学籍记录中均未找到其信息，这使得他的商业才能来源更加令人揣测。🤔</p>
+                        
+                        <h3>▎职业生涯</h3>
+                        <p>李简于2019年前后进入六欲集团，起初职位不明。约在2021年，因在一次集团内部的投资危机中展现出惊人的商业分析与操盘能力，被集团总会长张六乾破格提拔。</p>
+                        <p>此后，李简在集团内部经历了"火箭式"的晋升。他从基层项目组长做起，在短短四年内，凭借一系列漂亮的商业战绩，于2025年元旦被正式任命为战略企划室室长，成为六欲集团最年轻的核心高管。</p>
+                        
+                        <h3>▎商业成就</h3>
+                        <ul>
+                            <li><strong>金鼎资本收购案 (2022):</strong> 主导对海城老牌金融公司"金鼎资本"的恶意收购。通过精准的舆论攻击与法律漏洞利用，在三周内瓦解对方管理层，成功将金鼎资本并入六欲版图，是六欲金融业务扩张的标志性事件。🏆</li>
+                            <li><strong>"蓝色海岸"地产项目 (2023-2024):</strong> 策划将奢航区一块废弃工业用地包装为集艺术、娱乐、高端住宅于一体的文旅项目。通过引入国际设计团队和制造舆论热点，使该地块在一年内估值翻了二十倍，成为海城近年来最成功的地产投资案例之一。📈</li>
+                            <li><strong>集团风险控制模型 (2024-至今):</strong> 推动集团内部数据化改革，建立了一套专门针对灰色产业的风险评估与对冲模型。该模型能精准预测政策风险，并提供"替代性解决方案"，被认为是六欲集团在复杂政商环境下依然能保持高速增长的"安全阀"。📊</li>
+                        </ul>
+                        
+                        <h3>▎人物评价</h3>
+                        <ul>
+                            <li><strong>《海城财经周刊》：</strong> "李简是商业谈判桌上最危险的对手。他拥有绝美的面孔和屠夫的手段，他的微笑比他冰冷的眼神更令人不寒而栗。" 🔪</li>
+                            <li><strong>匿名合作伙伴：</strong> "他是一件完美的艺术品，但你永远不要妄想拥有他，因为你不知道这件艺术品什么时候会反过来将你吞噬。他只忠于利益和胜利。" 🖼️</li>
+                            <li><strong>商界流言：</strong> 因其在六欲集团的特殊地位和惊人美貌，私下里常被称为"张六乾最昂贵的武器"、"行走的商业机密"。</li>
+                        </ul>
+                        
+                        <h3>▎争议</h3>
+                        <p>李简的崛起之路一直伴随着诸多非议。</p>
+                        <ul>
+                            <li><strong>与张六乾的关系：</strong> 有传言称，李简不仅是张六乾的心腹，更扮演着更为私密的角色。其权力来源不仅在于商业才能，更在于张六乾对其毫无保留的"信任"与"宠爱"。🤫</li>
+                            <li><strong>"特殊公关"：</strong> 在六欲集团的业务中，李简常被委以负责与政府高层及关键人物的"特殊公关"工作。据信，海城许多棘手的政商合作项目，都是通过李简的"私人渠道"得以解决。其在六欲内部，也被认为是解决"常规手段无法解决的问题"的最终王牌。这使得他在海城权贵圈中拥有极高的知名度，但这种名声多流传于私密宴会与酒局之上。🍷</li>
+                        </ul>
+                    </div>
+                `
+            },
+            '李简 天鹅绒之刃': {
+                title: '【"李简 天鹅绒之刃"词条】',
+                content: `
+                    <div class="article fade-in">
+                        <div class="warning">
+[警告：本条目信息由多个来源交叉验证，但部分内容仍处于推测阶段。访问权限：Tier 4及以上]<br>
+[主题：人物档案]<br>
+[关键词：李简 / 天鹅绒之刃 / 六欲战略企划室]<br>
+[威胁等级：Ω (Omega) | 类别：战略 / 策反 / 心理操控]
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎识别代号：</h3>
+                        <p><strong>天鹅绒之刃 (The Velvet Blade)</strong></p>
+                        <p><strong>本名：</strong> 李简 (Jane Li - 该英文名为极少数核心圈内流传，来源及含义不明)</p>
+                        <p><strong>归属方：</strong> 六欲集团 (Six Desires Group)</p>
+                        <p><strong>公开职位：</strong> 战略企划室室长</p>
+                        <p><strong>真实职能：</strong> <strong>张六乾</strong>的首席操盘手、高级说客、以及最终解决方案。</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎能力评估</h3>
+                        <p><strong>主要威胁：非物理性。</strong> 目标的核心危险性在于其无可匹敌的智力、共情能力和心理操控技巧。他将商业、权术与人际关系玩弄于股掌之间。</p>
+                        
+                        <p><strong>1. 心理剖析与共情操控：</strong></p>
+                        <ul>
+                            <li>能在极短时间内精准识别目标的欲望、恐惧和弱点。</li>
+                            <li>极擅长角色扮演，能伪装成目标最渴望或最无害的样子，从而瓦解对方的心理防线。其表现出的"温柔"与"顺从"往往是其最致命的武器。</li>
+                        </ul>
+                        
+                        <p><strong>2. 战略布局：</strong></p>
+                        <ul>
+                            <li>拥有超越年龄的宏观视野和对细节的偏执掌控。其商业计划往往是多层嵌套的阳谋，即使对手看穿其中一环，也已深陷更大的陷阱之中。</li>
+                        </ul>
+                        
+                        <p><strong>3. 枕边情报 (Pillow Talk Intelligence)：</strong></p>
+                        <ul>
+                            <li>这是其最核心且最危险的情报获取手段。作为六欲集团用以打通政商关节的"特殊公关"，他能从海城最有权势的男人的床上获取第一手信息和致命把柄。他将自己的身体作为进入权力核心的钥匙。🔑</li>
+                        </ul>
+                        
+                        <p><strong>4. 超常痛苦耐受力：</strong></p>
+                        <ul>
+                            <li>据信其经历过极端的身体与精神创伤，导致其对痛苦（无论是生理或心理）的耐受阈值极高。常规的威胁、折磨手段对其几乎无效，甚至可能被其反向利用。</li>
+                        </ul>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎背景与弱点分析</h3>
+                        <p><strong>背景：</strong> 黑箱。所有官方记录都被抹除。普遍流传的说法是他来自灰铁区的底层，因不明原因被卷入六欲的黑色产业链，后因其卓越的头脑被张六乾发现并"圈养"。其崛起过程本身就是一个巨大的谜团。</p>
+                        
+                        <p><strong>与张六乾的关系：</strong></p>
+                        <ul>
+                            <li>这是一个危险的共生关系。李简是张六乾最得意的"作品"和最锋利的刀，但同时，这把刀的刀柄似乎并未被完全握住。他既是张六乾权力的延伸，也被认为是集团内部最大的不稳定因素。</li>
+                        </ul>
+                        
+                        <p><strong>已知关联高危资产：</strong></p>
+                        <ul>
+                            <li><strong>白色恶魔 (亚当)：</strong> 目前由其直接指挥。这意味着"天鹅绒之刃"不仅拥有顶级的脑力，还掌握着顶级的物理清除能力。这一组合使其综合威胁等级呈指数级上升。<strong>[高危警告]</strong> 任何针对李简的物理行动，都必须将"白色恶魔"的存在计为首要风险。</li>
+                        </ul>
+                        
+                        <p><strong>推测弱点：</strong></p>
+                        <ul>
+                            <li><strong>亚当：</strong> 该保镖与其关系似乎已超出单纯的保护与被保护。有迹象表明，李简对此人表现出非同寻常的保护欲和情感投入。这可能是他唯一的、尚未被外界利用过的情感缺口。🎯</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="comments-section">
+                        <h3 class="comments-title">▎情报交流区 (加密留言)</h3>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#1 匿名用户_c7a2：</div>
+                            <div class="comment-content">
+                                2022年，金鼎资本。我曾是那边的中层。我亲眼看着他走进会议室，用三句话就让我们CEO面如死灰。他甚至没提高过音量，但每个人都感觉脖子上架着一把刀。一周后，公司就姓张了。那家伙不是人，是个魔鬼。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#2 老饕：</div>
+                            <div class="comment-content">
+                                在翰林区的一个私人酒局上见过他一次。他被三个市议员围着，那场面你们懂的。但他全程滴酒不沾只喝苏打水，还能把那几个老色鬼哄得服服帖帖，出门时还主动给他披衣服。那种从骨子里透出来的疏离感和掌控力……太可怕了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#3 Cipher：</div>
+                            <div class="comment-content">
+                                别再把他当成张六乾的玩物了，你们这些蠢货。他是在利用张六乾提供的平台，编织自己的网。我查过六欲近三年的资金流，很多都指向几家由他亲信控制的海外空壳公司。他在为自己铺后路，或者说，在为一场战争储备弹药。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#4 ShadowBroker：</div>
+                            <div class="comment-content">
+                                总结一下：一个拥有魔鬼头脑和天使脸庞的战略家，身边还跟着一个神级的刺客保镖。他能陪你上床，也能让你破产。他能让你爱上他，也能让你从人间蒸发。<br><br>
+                                <strong>我的建议：把他当成一种自然灾害。你无法对抗，只能祈祷他的目标不是你。</strong> 🌪️
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            '亚当': {
+                title: '【"亚当"词条】',
+                content: `
+                    <div class="article fade-in">
+                        <div class="warning">
+[警告：以下信息来源于加密节点，真实性未经完全证实，阅览风险自负]<br>
+[主题：资产档案]<br>
+[关键词：亚当 / 六欲 / 白色恶魔]<br>
+[威胁等级：SSS+ | 遭遇建议：放弃任务，立即撤离]
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎识别代号：</h3>
+                        <p><strong>白色恶魔 (The White Devil)</strong></p>
+                        <p><strong>已知别名：</strong> 亚当 (Adam)</p>
+                        <p><strong>归属方：</strong> 六欲集团 (Six Desires Group)</p>
+                        <p><strong>所有权：</strong> <strong>张六乾</strong> (个人资产，非集团共有)</p>
+                        <p><strong>当前状态：</strong> 活跃。自2025年5月起，被指派为六欲高管<strong>李简</strong>的长期私人护卫，任务优先级不明。此项任命极不寻常。🤔</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎物理特征</h3>
+                        <p><strong>外观：</strong> 少年体型，身高约155-160cm。纯白色及肩卷发，面容精致如天使，性别特征不明显。外表极具迷惑性，常被误认为无害的未成年人。</p>
+                        
+                        <p><strong>核心缺陷/特征：</strong></p>
+                        <ol style="list-style: decimal; padding-left: 20px;">
+                            <li><strong>感官缺失 (视觉)：</strong> 经多方情报确认，目标为先天性完全失明。<strong>[高危警告]</strong> 切勿将此视为弱点。目标已将非视觉感官开发至超人水平。</li>
+                            <li><strong>痛觉钝化：</strong> 对物理伤害反应极低，疑似无痛觉。常规拷问、致伤性攻击对其无效。曾有记录显示其在肢体穿刺伤下仍能维持巅峰战斗力。</li>
+                        </ol>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎能力评估</h3>
+                        <p><strong>主要职能：</strong> 顶级刺客，专精无声潜入与清除 (Wetwork)。</p>
+                        <p><strong>听觉分析：</strong> 核心能力。能通过心跳、呼吸频率、肌肉收缩的微弱声音进行3D环境建模和动作预判。在完全无光或视线受阻环境中，其作战效能不降反升。</p>
+                        <p><strong>格斗风格：</strong> 极速、无声、致命。倾向于使用冷兵器，招式直接且无任何多余动作，以最小的动静造成最大的破坏。爆发力与体型完全不符。</p>
+                        <p><strong>心理侧写：</strong> 任务执行中表现为绝对的冷静与零情绪波动。有情报称其在终结目标前，会说出一些意义不明的台词 (例如"我给你十秒，跑还是死")，疑似某种个人仪式。此行为是其即将发动攻击的唯一预兆。</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎背景与关联</h3>
+                        <p><strong>训练源头：</strong> 由六欲安保部理事<strong>法拉盛</strong>一手训练。据信其技巧已全面超越其导师。</p>
+                        <p><strong>首次记录：</strong> 约2019年，以12岁之龄完成首次刺杀任务，目标为一名前军方人士。任务报告仅有"白色幽灵"一词。</p>
+                        <p><strong>资产价值：</strong> 非卖品。不接受任何形式的雇佣。白色恶魔只为张六乾的直接命令行动。任何试图对其进行雇佣、策反或抓捕的尝试，均被视为对张六乾的直接挑衅。</p>
+                    </div>
+                    
+                    <div class="comments-section">
+                        <h3 class="comments-title">▎情报交流区 (加密留言)</h3>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#1 匿名用户_4a7f：</div>
+                            <div class="comment-content">
+                                见过一次。目标在灰铁区的一个加固仓库。我们有五个人，全副武装。他进来的时候我们甚至没人发现。就像一阵风，然后血腥味就盖过了一切。我们连他用的是什么刀都没看清。我能活下来是因为我当时在外面望风。别去惹他，这是忠告。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#2 ShadowBroker：</div>
+                            <div class="comment-content">
+                                有人出价八位数想买他的档案，结果第二天买家全家都从海城蒸发了。张六乾把这小鬼当命根子护着。现在居然派去给那个姓李的小白脸当保镖？这里面水很深。建议各位把李简的威胁等级也上调到S级。靠近他=靠近白色恶魔。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#3 屠夫：</div>
+                            <div class="comment-content">
+                                我的人曾经和他对峙过。那小鬼当时说："垃圾就该被清理掉。" 然后……就没有然后了。那不是人类，那是披着人皮的灾难。遇到他，忘了你的任务，忘了你的钱，跑。能跑多远跑多远。🏃‍♂️💨
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#4 GhostWire：</div>
+                            <div class="comment-content">
+                                回复 <strong>#2 ShadowBroker</strong>：你说的"水很深"是什么意思？张六乾这种老狐狸，会把最锋利的刀交给别人拿着？那个李简到底是什么来头，能让张六乾这么信任？
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#5 匿名用户_b3c9：</div>
+                            <div class="comment-content">
+                                @<strong>GhostWire</strong>，老兄，你新来的？李简可不是"别人"。他是张六乾养在床上的金丝雀，这在海城上流圈子都不是秘密了。只不过这只金丝雀现在翅膀硬了，不仅会唱歌，还会咬人了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#6 Foxhound：</div>
+                            <div class="comment-content">
+                                @<strong>匿名用户_b3c9</strong>，金丝雀？我不同意。我跟六欲打过交道，见过李简。那家伙的气场比很多黑道老大都强。他看你的时候，你感觉自己从里到外都被扒光了。张六乾派"白色恶魔"给他，更像是给猛虎配上了最利的爪牙。我猜张六乾自己也开始怕了。🐯+😈
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#7 ShadowBroker：</div>
+                            <div class="comment-content">
+                                回复 <strong>#GhostWire</strong> & <strong>#Foxhound</strong>：<strong>Foxhound</strong>说对了一半。问题就在这。张六乾为什么要给一个可能威胁到自己的人配上终极武器？这不符合逻辑。除非有两个可能：<br><br>
+                                1. 张六乾对李简的"爱"已经超出了理智，这是情欲上的绝对信任。（我个人不信，张六乾不是这种人）<br><br>
+                                2. 他不是把刀交给了李简，而是把一把双刃剑放在了李简身边。这个"白色恶魔"既是保镖，也是监视者，甚至是最终的处刑人。如果李简有任何异动，这把刀会第一个割断他的喉咙。这才是张六乾的风格。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#8 匿名用户_d1e4：</div>
+                            <div class="comment-content">
+                                @<strong>ShadowBroker</strong>，你的分析很有道理。但还有一个疑点。"白色恶魔"本人是怎么想的？这种级别的资产，不可能没有一点自主意识。他被夹在两个主人之间，会怎么选？
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#9 卡戎 (Charon)：</div>
+                            <div class="comment-content">
+                                回复 <strong>#匿名用户_d1e4</strong>：你把问题想得太复杂了。对于"白色恶魔"这种被从小培养的"工具"来说，可能根本没有"选择"这个概念。他的世界里只有指令。现在他的首要指令就是"保护李简"。只要没有来自张六乾的更高优先级指令，他就会像条忠犬一样守着李简，撕碎所有靠近的威胁。至于他到底忠于谁……这得看最后谁能活下来对他下命令了。🤷‍♂️
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#10 GhostWire：</div>
+                            <div class="comment-content">
+                                听你们这么一说，我现在觉得李简才是最恐怖的那个。一个能让"白色恶魔"当贴身保镖，还能让张六乾又爱又怕的人……以后六欲的业务，看到跟李简沾边的，我直接绕道走。这趟浑水太深了。溜了溜了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#11 匿名用户_4a7f：</div>
+                            <div class="comment-content">
+                                +1。这个帖子应该收费。救人一命胜造七级浮屠。🙏
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            '张六乾': {
+                title: '【"张六乾"词条】',
+                content: `
+                    <div class="article fade-in">
+                        <h2>张六乾</h2>
+                        <p style="color: #888; font-size: 13px;">六欲集团创始人兼总会长 | 海城的地下皇帝与商业巨鳄</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎基本信息</h3>
+                        <p><strong>姓名：</strong> 张六乾</p>
+                        <p><strong>出生：</strong> 1978年（47岁）</p>
+                        <p><strong>籍贯：</strong> 不详（据传来自海城灰铁区）</p>
+                        <p><strong>职业：</strong> 企业家</p>
+                        <p><strong>现任：</strong> 六欲集团董事会主席、总会长</p>
+                        <p><strong>知名于：</strong> 将海城最大的黑道组织"六欲"成功洗白为现代化商业集团的传奇人物。</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <p>张六乾，是海城一个近乎禁忌的名字。他是六欲集团的绝对独裁者，一个从街头暴力和灰色交易中崛起，最终戴上企业家假面的枭雄。他的发家史是海城近三十年地下秩序演变的缩影，充满了血腥、权谋与深不可测的野心。外界对他评价两极分化：在商界，他是眼光毒辣、手段强硬的合作伙伴；在地下世界，他是令人生畏、说一不二的教父。👑</p>
+                        
+                        <h3>▎崛起之路</h3>
+                        <p>张六乾的早年经历是一片空白。据信，他在上世纪90年代末于海城最为混乱的灰铁区崭露头角，凭借过人的胆识和残忍的手段，整合了当地的多个小团伙，成立了"六欲"的雏形。早期的六欲以经营赌场、高利贷和收取保护费为主要业务，通过暴力手段迅速扩张，在21世纪初已成为海城最大的黑道组织。⚔️</p>
+                        
+                        <h3>▎商业转型</h3>
+                        <p>意识到传统黑道模式的局限性，张六乾在2015年左右开始谋求转型。他展现出了惊人的商业嗅觉，利用早期积累的"黑金"作为启动资金，开始涉足房地产、物流和娱乐产业。</p>
+                        <p>转型的关键节点在于他对人才的大胆任用。他摒弃了只用"兄弟"的传统黑帮思维，开始网罗各路精英，其中最著名的例子便是提拔了现任战略企划室长<strong>李简</strong>。正是李简等新生代高管的加入，为六欲集团注入了现代商业的管理理念和资本运作的手段，使其在短短数年内完成了惊人的"洗白"过程，并将业务版图拓展至金融投资领域，甚至提出了在纳斯达克上市的宏伟目标。💰</p>
+                        
+                        <h3>▎行事风格</h3>
+                        <p>张六乾的管理哲学是"胡萝卜加大棒"的极致体现。</p>
+                        <ul>
+                            <li><strong>绝对控制：</strong> 他对集团拥有绝对的控制权，董事会中的"元老"多是当年与他一同打江山的兄弟，对他忠心耿耿，但也惧怕他反复无常的性格。</li>
+                            <li><strong>实用主义：</strong> 他不问出身，只看价值。无论是街头混混还是名校精英，只要能为集团创造利益，他都会给予机会。他对李简的破格提拔与极度信赖，是其用人风格的最佳佐证。</li>
+                            <li><strong>心狠手辣：</strong> 尽管已是身价百亿的集团主席，但他从未抛弃其黑道本色。对于背叛者和敌人，他的处理方式往往直接而残酷。近年来，多起针对六欲集团的调查都因"关键证人失踪"或"证据突然消失"而不了了之。💀</li>
+                        </ul>
+                        
+                        <h3>▎个人生活与争议</h3>
+                        <ul>
+                            <li><strong>私生活成谜：</strong> 张六乾至今未婚，没有任何公开的伴侣或子嗣。这使得他与李简之间超乎寻常的亲密关系成为海城权贵圈津津乐道的秘闻。外界普遍猜测，李简不仅是他的得力干将，更是他最珍视的"私人藏品"。</li>
+                            <li><strong>欲殿 (The Desire Palace)：</strong> 作为六欲集团旗下的旗舰娱乐城，欲殿表面是海城最顶级的销金窟，暗地里却是张六乾用来编织关系网、进行权色交易的私人会所。据传，欲殿的奢靡与黑暗超乎想象，是六欲集团灰色产业的核心。🏰</li>
+                            <li><strong>"原罪"：</strong> 尽管六欲集团极力塑造其合法商业帝国的形象，但其依靠毒品交易、人口贩卖和暴力犯罪发家的"原罪"是无法抹去的。在海城警署内部，关于六欲的卷宗堆积如山，但从未能真正撼动其根基，背后庞大的保护伞实力可见一斑。⚖️</li>
+                        </ul>
+                    </div>
+                `
+            },
+            '六欲美人榜': {
+                title: '【"六欲美人榜"词条】',
+                content: `
+                    <div class="article fade-in">
+                        <div class="warning">
+[警告：本页内容为高度加密的私人流通信息，严禁外泄]<br>
+[主题：非官方资产评估 | The Desire List]<br>
+[关键词：六欲 / 美人榜 / 高风险欲望清单]
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎前言</h3>
+                        <p>此榜单由"收藏家俱乐部"匿名成员投票产生，旨在评估海城六欲集团内最具"收藏价值"的顶级资产。此处的"美"不仅指物理外观，更包括其稀有度、征服难度、以及成功后所能带来的极致满足感。请注意，本榜单上的每一位，都代表着致命的风险。欲望有价，生命无价。祝各位狩猎愉快。😈</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h2>【TOP 1：深渊白莲 (The White Lotus of the Abyss)】</h2>
+                        <p><strong>姓名/代号：</strong> 李简</p>
+                        <p><strong>欲望指数：</strong> ★★★★★</p>
+                        <p><strong>风险系数：</strong> ★★★★★</p>
+                        <p><strong>市场估价：</strong> 无法估量。传闻曾有中东王子开出九位数价格求一晚，被张六乾当场拒绝。</p>
+                        
+                        <h3>简评：</h3>
+                        <p>六欲集团最完美的艺术品，没有之一。拥有超越性别的美貌和与魔鬼交易的头脑。他不是温室里被圈养的金丝雀，而是在污泥中靠自己本事爬上权力巅峰的食人花。他的美在于那份破碎感与坚韧感的极致矛盾——既有被蹂躏过的痕迹，又有永不屈服的骄傲眼神。</p>
+                        <p>征服他，意味着你不仅要拥有能买下半个海城的财富，更要有能与他智力博弈的头脑和能承受他反噬的觉悟。得到他的身体不难，难的是让他那双冰冷的灰色眼睛里，只倒映出你的影子。他不仅仅是一个床伴，更是权力的象征。拥有李简，就等于向整个海城宣告：你征服了张六乾最引以为傲的杰作。</p>
+                        <p><strong>征服价值：</strong> 不在于占有，而在于让他心甘情愿地为你一人"堕落"。这比登上任何财富榜单都更令人兴奋。💎</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h2>【TOP 2：禁忌天使 (The Forbidden Angel)】</h2>
+                        <p><strong>姓名/代号：</strong> 亚当 (白色恶魔)</p>
+                        <p><strong>欲望指数：</strong> ★★★★★</p>
+                        <p><strong>风险系数：</strong> SSS+ (遭遇即死亡)</p>
+                        <p><strong>市场估价：</strong> 零。此资产不进入流通，任何询价行为都可能招致毁灭性报复。</p>
+                        
+                        <h3>简评：</h3>
+                        <p>一个只存在于传说中的矛盾体。拥有圣子般纯洁无瑕的面容和神话中炽天使的白发，却又是六欲最锋利的屠刀。他纯真，因为他眼盲，看不到世间的污秽；他残忍，因为他感受不到疼痛与怜悯。这种极致的纯粹与极致的危险结合，构成了最致命的诱惑。</p>
+                        <p>对他的欲望，源于对"不可能"的幻想：玷污最圣洁之物，驯服最凶残之兽。但所有人都知道，那双无焦点的银白杏眼永远不会为任何人停留，那具娇小的身体里蕴藏着足以撕碎一切的力量。他现在是李简的贴身护卫，如同最忠诚的守护灵。想碰李简？先问问这位天使答不答应。</p>
+                        <p><strong>征服价值：</strong> 一个都市传说。如果你能在亲吻他之后活下来，你将成为暗网永恒的神话。但至今无人成功。💀</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h2>【TOP 3：海城教父 (The Godfather of Haicheng)】</h2>
+                        <p><strong>姓名/代号：</strong> 张六乾</p>
+                        <p><strong>欲望指数：</strong> ★★★★☆</p>
+                        <p><strong>风险系数：</strong> ★★★★★</p>
+                        <p><strong>市场估价：</strong> 六欲集团的市值。</p>
+                        
+                        <h3>简评：</h3>
+                        <p>如果说前两位是欲望的具象，那么张六乾就是欲望本身。他早已过了靠脸吃饭的年纪，但他身上那股从尸山血海中沉淀出的权力气息，比任何年轻肉体都更让真正的玩家着迷。他儒雅的外表下是头彻尾的暴君，能微笑着将你的骨头一根根敲碎。</p>
+                        <p>对他产生欲望的人，爱的不是他的脸，而是他的帝国。征服他，不是让他躺在你的床上，而是让他为你让出王座。他是海城食物链的顶端，是行走的荷尔蒙与肾上腺素。能与他平起平坐地喝一杯酒，已是荣耀；能让他对你产生一丝兴趣，足以让你在海城横着走。更别提，他手里还牵着榜一那件最美的"艺术品"，征服他，或许能得到买一送一的惊喜？</p>
+                        <p><strong>征服价值：</strong> 成为新的国王，或者，成为国王身边唯一的"王后"。👑</p>
+                    </div>
+                    
+                    <div class="comments-section">
+                        <h3 class="comments-title">▎加密留言板</h3>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#1 匿名用户_b3e9：</div>
+                            <div class="comment-content">
+                                我全部的身家，只求李简对我笑一次，真心的那种。为了那个眼神，死也值了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#2 Hunter-X：</div>
+                            <div class="comment-content">
+                                楼上的疯了。我上次在宴会上离李简五米远，他身后的那个白毛小鬼就"看"了我一眼，我他妈到现在背脊还发凉。那根本不是人！
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#3 Midas：</div>
+                            <div class="comment-content">
+                                幼稚。你们只看到了皮相。真正的春药是权力。张六乾才是终极目标。得到他，等于得到整个海城。李简再美，也不过是战利品陈列柜上最亮的那一个罢了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#4 老蛇：</div>
+                            <div class="comment-content">
+                                呵呵，一群没见过世面的小屁孩。这榜单上的三个人，没一个是你们能碰的。好好活着吧，别做梦了。这个榜单的别名，叫"海城作死指南"。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#5 LuckyDog:</div>
+                            <div class="comment-content">
+                                @匿名用户_b3e9 兄弟，说得太玄乎了，他妈的一个眼神能值你全部身家？那到底是个什么样的眼神？能让人连命都不要？好奇死了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#6 匿名用户_b3e9:</div>
+                            <div class="comment-content">
+                                @LuckyDog 你不懂，你们这些只知道用下半身思考的蠢货根本不会懂。<br><br>
+                                我见过他很多次，在各种酒会上，在欲殿的包厢里。他对着那些脑满肠肥的客户笑，对着张六乾笑，甚至对着李权亨那种货色笑。那些笑都很完美，像教科书挑不出一点错，但那都是假的，像精致的冰壳子，底下什么都没有。但有一次，就那么一次，是在碧海庄园的一场派对之后，我因为有点事要和张六乾商量，所以留到了最后，当时宾客都走光了，他一个人站在露台的阴影里，刚穿好皱巴巴的衬衫，还沾着酒渍，看起来狼狈又脆弱，他以为四下无人了。<br><br>
+                                然后那个小保镖，就是榜上的白色恶魔，拿着一件外套走过来轻轻地披在他身上。<br><br>
+                                就在那一瞬间，我看到了。<br><br>
+                                李简他脸上的所有冰冷伪装都融化了，他微低下头，看着比他矮了一大截的小保镖，那双总像蒙着灰雾的眼睛里像是突然被点亮了，那是你走过了全世界的刀山火海，踏过了所有的尸体和背叛，然后你终于回到了家，看到了你唯一的那盏灯，那种眼神里有疲惫，有疼惜，有失而复得的庆幸，还有近乎虔诚的温柔。他的嘴角微微向上弯着，不是他平时勾人的笑，是发自内心的轻浅笑容，干净得就像他从未被这个世界玷污过。<br><br>
+                                那个眼神只在小保镖身上停留了不到三秒钟，但就是那三秒钟我突然明白了，这世界上所有的财富权力都比不上他那个眼神。因为那个眼神告诉你，原来地狱里真的能开出花，原来这个满身污泥的男人心里还藏着这么柔软的地方，而旁人这辈子都进不去。<br><br>
+                                所以我说我愿意用一切去换他用那样眼神看我，哪怕只有一秒。可惜我知道我没资格，我们都没资格，那是只属于他小保镖的独一无二的宝藏。<br><br>
+                                妈的，说不下去了，嫉妒得快疯了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#7 Hunter-X:</div>
+                            <div class="comment-content">
+                                ……我操。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#8 Midas:</div>
+                            <div class="comment-content">
+                                闭嘴吧你，搞得老子也想看了。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#9 城市游魂:</div>
+                            <div class="comment-content">
+                                看完@匿名用户_b3e9 的描述，突然觉得我们之前讨论的都变得很可笑，什么征服，什么估价都太廉价了。我们总在谈论他那双眼睛有多勾人，能看透人心。却没人想过当那双眼睛终于不再是武器，而仅仅是用来看人的时候会是什么样子，现在我们知道了。是像b3e9说的那样冰封世界都融化了的样子。<br><br>
+                                何其讽刺，李室长把最真实的自己给了唯一一个看不见他的人。<br><br>
+                                有句老话怎么说来着？人们常说世上有七大海洋，但他们都忘了爱人的眼睛是第八大海洋，那里面有风暴，有平静，有最深的海沟和无人知晓的宝藏。李室长为他的天使准备了一整片海洋，想让天使看到里面装满了怎样的星光和温柔，只可惜天使目盲，永远不会知道当他"望"向李简时，他的爱人正沉溺在一片只为他而存在的深不见底的汪洋里。唉……这或许是这个肮脏城市里，最奢侈也最残酷的童话了。💔
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#10 LuckyDog:</div>
+                            <div class="comment-content">
+                                妈的，怎么突然有点想哭。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#11 ShadowBroker:</div>
+                            <div class="comment-content">
+                                闭嘴吧你们！搞得好像我们是什么纯爱讨论组一样！这里是暗网！我们是来搞钱搞情报的！不过，#9说得真他妈好。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#12 驯兽师:</div>
+                            <div class="comment-content">
+                                看着你们一群小屁孩在这里为了虚无缥缈的"爱情"感慨来感慨去，真是腻歪，还他妈第八大海洋？笑死人了。<br><br>
+                                你们的眼睛都瞎了吗？只盯着墙上的那幅画，却看不见画廊真正的主人张六乾？李简再美，那也是被雕琢出来的美，是被驯养出来的利爪，亚当再纯，那也不过是被锁起来的、尚未开刃的凶器，他们都是展品、资产，而你们却在为两个展品之间可笑的化学反应感动得一塌糊涂 。<br><br>
+                                真正的极品是站在所有展品背后，决定他们价值、掌控他们命运的张六乾，你们懂什么是真正的性感吗？是权力，是年近五十的男人，眼角的每道皱纹都写满了征服过的版图；是他端着酒杯，用那双看过无数尸体和黄金的眼睛淡淡地扫你一眼，你就知道自己从里到外都被他看透了；是他一下命令，整个海城的地下世界都要为之震颤。这才是极致的掌控感、顶级的Daddy感！他不需讨好任何人，因为他本身就是规则，在他面前，你会心甘情愿地献上一切，渴望被他支配，被他掌控，能被他掐住脖子多么让人兴奋！<br><br>
+                                你们觉得李简和亚当是童话？在我看来那不过是张六乾的失误，是他完美掌控中的裂痕，他居然允许自己最得意的作品爱上自己的看门狗，我可不会犯这种错误！忘了那片虚无缥缈的海洋吧，我更愿意沉溺在他身上那股混杂着雪茄、权力和血腥味的 intoxicating 气息里，那才是熟男的终极春药🥃
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#13 Midas:</div>
+                            <div class="comment-content">
+                                @驯兽师 说得好，终于有个明白人了👍都被你说得有点兴奋了。
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            '复仇者联盟': {
+                title: '【"复仇者联盟"词条】',
+                content: `
+                    <div class="article fade-in">
+                        <div class="warning">
+[CRITICAL ALERT: ACCESS DENIED. TIER 7 CLEARANCE REQUIRED]<br>
+[...Forcing decryption... ERROR... Rerouting through compromised node...]<br>
+[...DECRYPTION PARTIALLY SUCCESSFUL. DATA INTEGRITY AT 17%. PROCEED WITH EXTREME CAUTION.]
+                        </div>
+                       
+                        <div class="warning">
+[主题：Speculative Analysis - The 'Li Jian Network']<br>
+[关键词：关联人物 / 忠诚度评估 / 复仇者联盟 (Theatrical Moniker)]<br>
+[可信度等级：D- | 威胁指数：S (Discussing this topic is considered a direct provocation)]
+                        </div>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎概述</h3>
+                        <p>本条目旨在分析"天鹅绒之刃"<strong>李简</strong>身边潜在的、具有高度忠诚度的关联人物。情报市场上流传着一个颇为戏剧化的称谓——"复仇者联盟"，用以形容一个疑似围绕在李简身边的秘密小团体。然而，<strong>必须强调，该"联盟"的存在本身缺乏直接证据，</strong> 更可能是一种基于李简过往经历的浪漫化臆想。</p>
+                        <p>以下人物被多个信源指认为李简权力网络中的关键节点，但他们之间的真实关系仍处于高度不确定的迷雾之中。</p>
+                        
+                        <div class="divider"></div>
+                        
+                        <h3>▎潜在节点分析 (LOW CONFIDENCE)</h3>
+                        
+                        <p><strong>白羽 (市场部副部长):</strong></p>
+                        <ul>
+                            <li><strong>公开关系：</strong> 李简一手提拔的下属，典型的职场师徒关系。白羽对李简表现出极高的崇拜与专业上的信服。</li>
+                            <li><strong>推测：</strong> 可能是李简在集团中层安插的最可靠的"眼睛"。但其忠诚度是基于个人崇拜还是更深层次的联系，尚不明确。</li>
+                        </ul>
+                        
+                        <p><strong>柳如烟 (后勤室室长):</strong></p>
+                        <ul>
+                            <li><strong>公开关系：</strong> 集团元老之一，对集团内所有高管均保持着礼貌而疏远的距离。</li>
+                            <li><strong>推测：</strong> 有情报显示，柳如烟对李简抱有近乎母性的同情。但这更可能是一种长辈对优秀晚辈的欣赏，将其归为"盟友"的证据链不足。她掌握着集团大量的"后台"信息，但没有理由与李简共享。</li>
+                        </ul>
+                        
+                        <p><strong>许鹤 (财务部理事):</strong></p>
+                        <ul>
+                            <li><strong>公开关系：</strong> 与李简在多个项目上有过密切合作的财务专家。</li>
+                            <li><strong>推测：</strong> 一个有入狱前科的女人。李简重用她，看中的是她的专业能力和"不干净"的背景，这种人更容易控制。他们的关系更像是互相利用的交易，而非基于信任的同盟。</li>
+                        </ul>
+                        
+                        <p><strong>王志元 (人事部部长):</strong></p>
+                        <ul>
+                            <li><strong>公开关系：</strong> 与李简同为新生代高管，存在潜在的竞争关系。</li>
+                            <li><strong>推测：</strong> 两人在几次董事会权力斗争中似乎有过默契的配合。但这更像是为了对抗张六乾身边元老派而形成的临时战术同盟，随时可能因利益冲突而瓦解。</li>
+                        </ul>
+                        
+                        <p><strong>[数据损坏]...小...[数据损坏]...</strong></p>
+                        <ul>
+                            <li>情报提及一个战略企划室的低阶人员，但信息过于模糊，无法进行有效分析。可能是无关紧要的杂音。</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="comments-section">
+                        <h3 class="comments-title">▎情报交流区 (加密留言)</h3>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#1 匿名用户_f0e1：</div>
+                            <div class="comment-content">
+                                "复仇者联盟"？你们是看漫画看多了吗？笑死我了，李简这种人会相信"盟友"？别天真了。在他眼里所有人都是棋子，唯一的区别是暂时有用和已经没用。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#2 Cipher：</div>
+                            <div class="comment-content">
+                                回复 <strong>#1</strong>：我同意，这整个词条都像是一厢情愿的同人小说。李简的核心是孤独和不信任，他可能会利用这些人，但绝不会将自己的后背交给他们，他唯一的盟友或许只有亚当。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#3 ShadowBroker：</div>
+                            <div class="comment-content">
+                                这个话题很危险，你们在讨论的不是一个小团体，而是在试图描绘蜘蛛网的结构。但你们有没有想过，这个词条本身会不会就是蜘蛛放出的诱饵？用来看看有哪些苍蝇会对他的网感兴趣，你们的每次点击和讨论都可能正在被网的主人记录。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#4 匿名用户_9b4d：</div>
+                            <div class="comment-content">
+                                @<strong>ShadowBroker</strong>，你说的我脊背发凉，这帖子确实出现的很诡异，权限要求也乱七八糟的，感觉像陷阱。
+                            </div>
+                        </div>
+                        
+                        <div class="comment">
+                            <div class="comment-header">#5 Oracle：</div>
+                            <div class="comment-content">
+                                <strong>[管理员留言]</strong><br><br>
+                                <strong>本主题已被锁定。</strong><br><br>
+                                经查，该信息源头不明，存在高度污染和误导性，追查李简的私人关系网络被视为挑衅行为，重复讨论此话题的ID将被永久封禁。<br><br>
+                                <strong>忠告：有些深渊，你只要凝视，就会被它吞噬。</strong><br><br>
+                                <strong>[此线索已终结]</strong> ☠️
+                            </div>
+                        </div>
+                    </div>
+                `
+            }
+        };
+
+        const coverPage = document.getElementById('coverPage');
+        const mainPage = document.getElementById('mainPage');
+        const searchContainer = document.getElementById('searchContainer');
+        const searchBox = document.getElementById('searchBox');
+        const contentArea = document.getElementById('contentArea');
+
+        coverPage.addEventListener('click', () => {
+            const music = document.getElementById('bgMusic');
+            if (music.paused) {
+                music.play().catch(e => console.log('播放失败:', e));
+            }
+            coverPage.style.display = 'none';
+            mainPage.classList.add('active');
+            setTimeout(() => searchBox.focus(), 300);
+        });
+
+        searchBox.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        
+        const query = searchBox.value.trim().toLowerCase();
+        // 【新增这一行】获取我们第一步在 HTML 里新建的、专门用来放文章的盒子
+        const searchResults = document.getElementById('searchResults'); 
+        
+        if (query === '') {
+            searchContainer.classList.remove('top');
+            contentArea.classList.remove('active');
+            // 【修改点1】只清空文章盒子，保护评论区不被删
+            searchResults.innerHTML = ''; 
+            return;
+        }
+
+        mainPage.style.justifyContent = 'flex-start'; 
+        searchContainer.classList.add('top');
+        contentArea.classList.add('active');
+
+        let found = false;
+        let results = '';
+
+        for (let key in articles) {
+            if (key.toLowerCase().includes(query)) {
+                results += articles[key].content;
+                found = true;
+            }
+        }
+
+        if (found) {
+            contentArea.scrollTop = 0;
+            // 【修改点2】只清空文章盒子
+            searchResults.innerHTML = ''; 
+            // 【修改点3】让打字机特效把内容写进 searchResults 里面，而不是 contentArea 里面
+            hackerTypeWriter(results, searchResults); 
+        } else {
+            // 【修改点4】未找到词条的提示也只放进文章盒子里
+            searchResults.innerHTML = '<div class="no-results">未找到相关词条</div>'; 
+        }
+    }
+});
+
+searchBox.addEventListener('input', (e) => {
+    if (e.target.value.trim() === '') {
+        searchContainer.classList.remove('top');
+        contentArea.classList.remove('active');
+        document.getElementById('searchResults').innerHTML = ''; 
+        document.getElementById('global-comments').style.display = 'none';
+    }
+});
+        const playBtn = document.getElementById('playBtn');
+        let isPlaying = false;
+
+        playBtn.addEventListener('click', () => {
+            const music = document.getElementById('bgMusic');
+            if (!music) return;
+
+            if (isPlaying) {
+                music.pause();
+                playBtn.innerHTML = '▶️';
+                isPlaying = false;
+            } else {
+                music.play().catch(e => console.log('播放失败', e));
+                playBtn.innerHTML = '⏸️';
+                isPlaying = true;
+            }
+        });
+window.addEventListener('DOMContentLoaded', () => {
+    const music = document.getElementById('bgMusic');
+    const alarm = document.getElementById('alarmSound');
+    const typewriter = document.getElementById('typeSound');
+
+    if (music) music.volume = 0.2;
+    if (alarm) alarm.volume = 1.0;
+    if (typewriter) typewriter.volume = 0.8;
+});
+function hackerTypeWriter(htmlContent, targetArea) {
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = htmlContent;
+    const warnings = tempDiv.querySelectorAll('.warning');
+    const typeSound = document.getElementById('typeSound');
+    const alarmSound = document.getElementById('alarmSound');
+    const container = document.querySelector('.container');
+
+    if (warnings.length > 0) {
+        // 有警告 → 执行解密动画
+        container.classList.add('alarm-active');
+        document.body.style.backgroundColor = "#4a0000";
+        if (alarmSound) alarmSound.play().catch(() => {});
+
+        let textToType = '';
+        warnings.forEach(w => {
+            const cleanedText = w.innerText.split('\n').map(line => line.trim()).filter(line => line).join('\n');
+            textToType += cleanedText + '\n\n';
+        });
+
+        targetArea.innerHTML = `
+            <div class="decrypt-container">
+                <div class="decrypt-bar" id="decryptBar"></div>
+                <div class="decrypt-status" id="decryptStatus">DECRYPTING: 0%</div>
+            </div>
+            <div class="warning" style="white-space: pre-wrap;" id="hacker-text"></div>
+        `;
+
+        const textBox = document.getElementById('hacker-text');
+        const bar = document.getElementById('decryptBar');
+        const status = document.getElementById('decryptStatus');
+
+        let i = 0;
+        function typeNextChar() {
+            if (i < textToType.length) {
+                if (typeSound) {
+                    typeSound.currentTime = 0;
+                    typeSound.play().catch(() => {});
+                }
+
+                let progress = Math.round(((i + 1) / textToType.length) * 100);
+                bar.style.width = progress + '%';
+                if (i % 3 === 0) {
+                    const chars = "!@#$%^&*()_+";
+                    const randomChar = chars[Math.floor(Math.random() * chars.length)];
+                    status.innerText = `DECRYPTING: ${progress}% [${randomChar}]`;
+                } else {
+                    status.innerText = `DECRYPTING: ${progress}%`;
+                }
+
+                textBox.innerHTML = textToType.substring(0, i + 1) + '<span class="cursor"></span>';
+                i++;
+                setTimeout(typeNextChar, 25);
+            } else {
+                status.innerText = "ACCESS GRANTED - DECRYPTION COMPLETE";
+                status.style.color = "#00ff00";
+
+                setTimeout(() => {
+                    container.classList.remove('alarm-active');
+                    document.body.style.backgroundColor = "#0a0a0a";
+                    if (alarmSound) {
+                        alarmSound.pause();
+                        alarmSound.currentTime = 0;
+                    }
+                    targetArea.innerHTML = htmlContent;
+                    
+                    document.getElementById('global-comments').style.display = 'block'; 
+                    
+                }, 1000);
+            }
+        }
+
+        typeNextChar();
+
+    } else {
+        targetArea.innerHTML = htmlContent;
+    }
+}
+</script>
+</body>
+</html>
