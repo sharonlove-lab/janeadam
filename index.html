@@ -273,7 +273,7 @@ overflow-y: auto;
     font-family: 'Arial Black', sans-serif;
     font-weight: 900;
     pointer-events: none;
-    z-index: 9999;
+    z-index: 999;
     text-shadow: 0 0 10px #000, 0 0 20px #ff0000;
     white-space: nowrap;
     animation: textFlash 0.1s infinite;
@@ -558,50 +558,74 @@ overflow-y: auto;
             <div class="search-container" id="searchContainer">
                 <input type="text" class="search-box" id="searchBox" placeholder="搜索词条..." autocomplete="off">
             </div>
-            <div class="content-area" id="contentArea">
-    <div id="searchResults"></div>
-    
+<div class="content-area" id="contentArea" style="display: none; padding: 20px; overflow-y: auto; flex: 1; margin-top: 100px;">
+    <div id="article-content"></div>
+
     <div id="global-comments" style="margin: 40px 0; padding: 20px; background: rgba(20,20,20,0.6); border-radius: 12px; border: 1px solid rgba(139,0,0,0.3); display: none;">
-<script src="https://giscus.app/client.js"
-        data-repo="sharonlove-lab/janeadam"
-        data-repo-id="R_kgDORyBBQg"
-        data-category="Announcements"
-        data-category-id="DIC_kwDORyBBQs4C5YDA"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="dark"
-        data-lang="zh-CN"
-        crossorigin="anonymous"
-        async>
-</script>
+        <script src="https://giscus.app/client.js"
+            data-repo="sharonlove-lab/janeadam"
+            data-repo-id="R_kgDORyBBQg"
+            data-category="Announcements"
+            data-category-id="DIC_kwDORyBBQs4C5YDA"
+            data-mapping="pathname"
+            data-strict="0"
+            data-reactions-enabled="1"
+            data-emit-metadata="0"
+            data-input-position="bottom"
+            data-theme="preferred_color_scheme"
+            data-lang="zh-CN"
+            crossorigin="anonymous"
+            async>
+        </script>
     </div>
 </div>
         </div>
     </div>
 
-    <div id="global-comments" style="margin: 40px 20px; padding: 20px; background: rgba(20,20,20,0.6); border-radius: 12px; border: 1px solid rgba(139,0,0,0.3);">
-        <script src="https://giscus.app/client.js"
-        data-repo="sharonlove-lab/janeadam"
-        data-repo-id="R_kgDORyBBQg"
-        data-category="Announcements"
-        data-category-id="DIC_kwDORyBBQs4C5YDA"
-        data-mapping="pathname"
-        data-strict="0"
-        data-reactions-enabled="1"
-        data-emit-metadata="0"
-        data-input-position="bottom"
-        data-theme="preferred_color_scheme"
-        data-lang="zh-CN"
-        crossorigin="anonymous"
-        async>
-</script>
-    </div>
-
 
     <script>
+// 用来管理当前正在进行的解密动画，防止多个动画冲突
+let activeDecrypt = {
+    active: false,          // 是否有动画正在运行
+    typeTimer: null,        // 打字动画的定时器
+    finalTimer: null,       // 最后的延迟定时器
+    abortFlag: false        // 是否被强制中止
+};
+
+// 强制中止当前正在运行的解密动画或延迟显示
+function abortCurrentDecrypt() {
+    // 清除打字动画的定时器
+    if (activeDecrypt.typeTimer) {
+        clearTimeout(activeDecrypt.typeTimer);
+        activeDecrypt.typeTimer = null;
+    }
+    // 清除最后的延迟定时器
+    if (activeDecrypt.finalTimer) {
+        clearTimeout(activeDecrypt.finalTimer);
+        activeDecrypt.finalTimer = null;
+    }
+    // 标记为已中止，让正在执行的动画停止继续
+    activeDecrypt.abortFlag = true;
+    activeDecrypt.active = false;
+
+    // 停止警报音效
+    const alarmSound = document.getElementById('alarmSound');
+    if (alarmSound) {
+        alarmSound.pause();
+        alarmSound.currentTime = 0;
+    }
+    // 移除警报闪烁样式
+    const container = document.querySelector('.container');
+    if (container) container.classList.remove('alarm-active');
+    document.body.style.backgroundColor = '#0a0a0a';
+
+    // 清空内容区域（防止残留旧内容）
+    const articleBox = document.getElementById('article-content');
+    if (articleBox) articleBox.innerHTML = '';
+    // 隐藏评论区
+    const commentBox = document.getElementById('global-comments');
+    if (commentBox) commentBox.style.display = 'none';
+}
         const articles = {
             '李室长': {
                 title: '【"李室长"词条】',
@@ -666,7 +690,7 @@ overflow-y: auto;
                     </div>
                 `
             },
-            '李简 天鹅绒之刃': {
+            '天鹅绒': {
                 title: '【"李简 天鹅绒之刃"词条】',
                 content: `
                     <div class="article fade-in">
@@ -968,7 +992,7 @@ overflow-y: auto;
                     </div>
                 `
             },
-            '六欲美人榜': {
+            '美人': {
                 title: '【"六欲美人榜"词条】',
                 content: `
                     <div class="article fade-in">
@@ -1131,7 +1155,7 @@ overflow-y: auto;
                     </div>
                 `
             },
-            '复仇者联盟': {
+            '复仇': {
                 title: '【"复仇者联盟"词条】',
                 content: `
                     <div class="article fade-in">
@@ -1251,52 +1275,38 @@ overflow-y: auto;
 
         searchBox.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {
-        e.preventDefault();
+        const searchValue = searchBox.value.trim();
         
-        const query = searchBox.value.trim().toLowerCase();
-        // 【新增这一行】获取我们第一步在 HTML 里新建的、专门用来放文章的盒子
-        const searchResults = document.getElementById('searchResults'); 
-        
-        if (query === '') {
-            searchContainer.classList.remove('top');
-            contentArea.classList.remove('active');
-            // 【修改点1】只清空文章盒子，保护评论区不被删
-            searchResults.innerHTML = ''; 
-            return;
-        }
+        // 【修复1】这里必须用你定义的 articles，而不是 dictionary
+        if (articles[searchValue]) {
+            const results = articles[searchValue].content; // 获取词条内容
+            
+const searchContainer = document.getElementById('searchContainer');
+            searchContainer.classList.add('top');
+            contentArea.classList.add('active');
+            contentArea.style.display = 'block';
 
-        mainPage.style.justifyContent = 'flex-start'; 
-        searchContainer.classList.add('top');
-        contentArea.classList.add('active');
+            const articleBox = document.getElementById('article-content');
+            const commentBox = document.getElementById('global-comments');
 
-        let found = false;
-        let results = '';
 
-        for (let key in articles) {
-            if (key.toLowerCase().includes(query)) {
-                results += articles[key].content;
-                found = true;
-            }
-        }
-
-        if (found) {
-            contentArea.scrollTop = 0;
-            // 【修改点2】只清空文章盒子
-            searchResults.innerHTML = ''; 
-            // 【修改点3】让打字机特效把内容写进 searchResults 里面，而不是 contentArea 里面
-            hackerTypeWriter(results, searchResults); 
+commentBox.style.display = 'none';
+            hackerTypeWriter(results, articleBox);
         } else {
-            // 【修改点4】未找到词条的提示也只放进文章盒子里
-            searchResults.innerHTML = '<div class="no-results">未找到相关词条</div>'; 
+            // 未找到词条
+            document.getElementById('article-content').innerHTML = '<div class="no-results">未找到词条</div>';
+            document.getElementById('global-comments').style.display = 'none';
         }
     }
 });
 
 searchBox.addEventListener('input', (e) => {
     if (e.target.value.trim() === '') {
+        // 清空时中止动画，恢复初始状态
+        abortCurrentDecrypt();
         searchContainer.classList.remove('top');
         contentArea.classList.remove('active');
-        document.getElementById('searchResults').innerHTML = ''; 
+        document.getElementById('article-content').innerHTML = '';
         document.getElementById('global-comments').style.display = 'none';
     }
 });
@@ -1327,6 +1337,13 @@ window.addEventListener('DOMContentLoaded', () => {
     if (typewriter) typewriter.volume = 0.8;
 });
 function hackerTypeWriter(htmlContent, targetArea) {
+    // 1️⃣ 先中止之前任何还在运行的动画
+    abortCurrentDecrypt();
+
+    // 2️⃣ 重置中止标记，并标记新的动画开始
+    activeDecrypt.abortFlag = false;
+    activeDecrypt.active = true;
+
     const tempDiv = document.createElement('div');
     tempDiv.innerHTML = htmlContent;
     const warnings = tempDiv.querySelectorAll('.warning');
@@ -1334,18 +1351,20 @@ function hackerTypeWriter(htmlContent, targetArea) {
     const alarmSound = document.getElementById('alarmSound');
     const container = document.querySelector('.container');
 
+    // 有警告 → 执行解密动画
     if (warnings.length > 0) {
-        // 有警告 → 执行解密动画
         container.classList.add('alarm-active');
         document.body.style.backgroundColor = "#4a0000";
         if (alarmSound) alarmSound.play().catch(() => {});
 
+        // 收集所有警告文本
         let textToType = '';
         warnings.forEach(w => {
             const cleanedText = w.innerText.split('\n').map(line => line.trim()).filter(line => line).join('\n');
             textToType += cleanedText + '\n\n';
         });
 
+        // 显示解密进度条和文本框
         targetArea.innerHTML = `
             <div class="decrypt-container">
                 <div class="decrypt-bar" id="decryptBar"></div>
@@ -1359,7 +1378,10 @@ function hackerTypeWriter(htmlContent, targetArea) {
         const status = document.getElementById('decryptStatus');
 
         let i = 0;
+        // 打字动画函数
         function typeNextChar() {
+            // 如果动画被中止，就不再继续
+            if (activeDecrypt.abortFlag) return;
             if (i < textToType.length) {
                 if (typeSound) {
                     typeSound.currentTime = 0;
@@ -1378,30 +1400,64 @@ function hackerTypeWriter(htmlContent, targetArea) {
 
                 textBox.innerHTML = textToType.substring(0, i + 1) + '<span class="cursor"></span>';
                 i++;
-                setTimeout(typeNextChar, 25);
+                // 保存定时器，以便之后可以清除
+                activeDecrypt.typeTimer = setTimeout(typeNextChar, 25);
             } else {
+                // 解密完成
                 status.innerText = "ACCESS GRANTED - DECRYPTION COMPLETE";
                 status.style.color = "#00ff00";
 
-                setTimeout(() => {
+                // 保存最后的延迟定时器
+                activeDecrypt.finalTimer = setTimeout(() => {
+                    // 如果动画被中止过，就不显示内容
+                    if (activeDecrypt.abortFlag) return;
                     container.classList.remove('alarm-active');
                     document.body.style.backgroundColor = "#0a0a0a";
                     if (alarmSound) {
                         alarmSound.pause();
                         alarmSound.currentTime = 0;
                     }
-                    targetArea.innerHTML = htmlContent;
-                    
-                    document.getElementById('global-comments').style.display = 'block'; 
-                    
+
+                    document.getElementById('article-content').innerHTML = htmlContent;
+                    document.getElementById('global-comments').style.display = 'block';
+                    activeDecrypt.active = false;
                 }, 1000);
             }
         }
 
+        // 开始打字
         typeNextChar();
-
-    } else {
-        targetArea.innerHTML = htmlContent;
+    } 
+    // 没有警告 → 直接显示（模拟一个简短解密效果）
+    else {
+        // 先显示一个简易解密条（1秒）
+        targetArea.innerHTML = `
+            <div class="decrypt-container">
+                <div class="decrypt-bar" id="decryptBar"></div>
+                <div class="decrypt-status" id="decryptStatus">DECRYPTING: 0%</div>
+            </div>
+        `;
+        const bar = document.getElementById('decryptBar');
+        const status = document.getElementById('decryptStatus');
+        let progress = 0;
+        function fakeProgress() {
+            if (activeDecrypt.abortFlag) return;
+            progress += 25;
+            bar.style.width = progress + '%';
+            status.innerText = `DECRYPTING: ${progress}%`;
+            if (progress < 100) {
+                activeDecrypt.typeTimer = setTimeout(fakeProgress, 250);
+            } else {
+                status.innerText = "ACCESS GRANTED";
+                activeDecrypt.finalTimer = setTimeout(() => {
+                    if (activeDecrypt.abortFlag) return;
+                    targetArea.innerHTML = htmlContent;
+                    document.getElementById('global-comments').style.display = 'block';
+                    activeDecrypt.active = false;
+                }, 300);
+            }
+        }
+        fakeProgress();
     }
 }
 let clickCount = 0;
